@@ -1,0 +1,35 @@
+name: Daily Work Report RPA
+
+on:
+  schedule:
+    # ตั้งเวลาให้รัน (เวลาเป็น UTC) 
+    # 01:00 UTC = 08:00 AM เวลาไทย
+    - cron: '0 1 * * *'
+  workflow_dispatch: # ปุ่มสำหรับกดรันเองเพื่อทดสอบ
+
+jobs:
+  run-rpa:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install playwright requests
+          playwright install chromium
+
+      - name: Run RPA script
+        env:
+          # เชื่อมต่อโค้ดกับ Secrets ที่เราตั้งไว้
+          MY_USER: ${{ secrets.MY_USER }}
+          MY_PASSWORD: ${{ secrets.MY_PASSWORD }}
+          LINE_TOKEN: ${{ secrets.LINE_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+        run: python main.py
